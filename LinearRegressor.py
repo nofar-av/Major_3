@@ -1,7 +1,7 @@
 from sklearn.base import BaseEstimator, RegressorMixin
 import numpy as np
 
-    class LinearRegressor(BaseEstimator, RegressorMixin):
+class LinearRegressor(BaseEstimator, RegressorMixin):
     """
     Custom linear regression model
     """
@@ -41,9 +41,14 @@ import numpy as np
         """
 
         # TODO: complete the loss calculation
-        loss = None
 
-        return loss
+        b_vector = np.ones(X.shape[0])*b
+        loss = X.dot(w) + b_vector - y.squeeze()
+        norm = np.linalg.norm(loss)
+        squared_norm = np.power(norm, 2)
+        mse_loss = squared_norm / X.shape[0]
+        return mse_loss
+        
 
     @staticmethod
     def gradient(w, b: float, X, y):
@@ -57,9 +62,12 @@ import numpy as np
         :return: a tuple with (the gradient of the weights, the gradient of the bias)
         """
         # TODO: calculate the analytical gradient w.r.t w and b
-        g_w = None
-        g_b = 0.0
 
+        b_vector = np.ones(X.shape[0])*b
+        inner_derivative = X.dot(w) + b_vector -y.squeeze()
+
+        g_w = (2 * X.T.dot(inner_derivative)) / X.shape[0]
+        g_b = (2 * np.ones(X.shape[0]).T.dot(inner_derivative)) / X.shape[0]
         return g_w, g_b
 
     def fit_with_logs(self, X, y, max_iter: int = 1000, keep_losses: bool = True,
@@ -93,12 +101,12 @@ import numpy as np
             batch_y = y[start_idx: end_idx]
 
             # TODO: Compute the gradient for the current *batch*
-            g_w, g_b = None, None
+            g_w, g_b = self.gradient(self.w, self.b, batch_X, batch_y)
 
             # Perform a gradient step
             # TODO: update the learned parameters correctly
-            self.w = None
-            self.b = 0.0
+            self.w = self.w - np.multiply(self.lr, g_w)
+            self.b = self.b - np.multiply(self.lr, g_b)
 
             if keep_losses:
                 train_losses.append(self.loss(self.w, self.b,  X, y))
@@ -128,6 +136,10 @@ import numpy as np
         """
 
         # TODO: Compute
-        y_pred = None
+        m = X.shape[0]
+        if m == 0: 
+            return 0
+        b_vector = np.ones(X.shape[0])*self.b
+        y_pred = np.sum(np.multiply(X,self.w), b_vector)
 
         return y_pred
