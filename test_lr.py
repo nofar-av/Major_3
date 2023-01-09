@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from LinearRegressor import LinearRegressor
 
-def test_lr(X_train, y_train, X_val, y_val, title:str, max_iter = 5000):
+def test_lr(X_train, y_train, X_val, y_val, title:str, max_iter = 3000):
   lr_list = np.logspace(-9, -1, 9)
 
   fig, axs = plt.subplots(3, 3, sharey=True, figsize=(20, 12))
