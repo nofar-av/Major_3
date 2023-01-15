@@ -38,7 +38,7 @@ from sklearn.model_selection import cross_validate
 
 X_train = subset_train.drop("contamination_level", axis = 1, inplace = False)
 y_train = subset_train.contamination_level
-
+#Q14
 validation_scores = []
 train_scores = []
 alpha_list = np.logspace(-10, 2, 40)
@@ -95,7 +95,7 @@ from sklearn.model_selection import cross_validate
 
 validation_scores = []
 train_scores = []
-alpha_list = np.logspace(-3, 0, 7)
+alpha_list = np.logspace(-5, 5, 15)
 # alpha_list = np.linspace(0,1, 11)
 
 
@@ -107,7 +107,7 @@ for alpha in alpha_list:
     results = cross_validate(lasso, X_train, y=y_train, scoring='neg_mean_squared_error', return_train_score=True)
     train_scores.append( results["train_score"].mean())
     validation_scores.append( results["test_score"].mean())
-    plot3d(subset_train, "PCR_01", "PCR_05", "contamination_level", predictions = lasso.predict(X_train), title = "Predictions of Lasso (polynomial) of contamination_level "+ str(alpha))
+    # plot3d(subset_train, "PCR_01", "PCR_05", "contamination_level", predictions = lasso.predict(X_train), title = "Predictions of Lasso (polynomial) of contamination_level "+ str(alpha))
 
 g = plt.semilogx(alpha_list, train_scores, color = 'orange', markersize = 15)
 g = plt.semilogx(alpha_list, validation_scores, color = 'teal', markersize = 15)

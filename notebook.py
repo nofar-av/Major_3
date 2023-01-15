@@ -45,100 +45,102 @@ y_val = t_val["contamination_level"]
 # test_lr(X_train, y_train, X_val=X_val, y_val = y_val, title="Linear Regressor Losses with different learning rates")
 
 #Section 2 - Evaluation and Baseline
-from sklearn.dummy import DummyRegressor
+# from sklearn.dummy import DummyRegressor
 
-dummy_regr = DummyRegressor(strategy="mean")
+# dummy_regr = DummyRegressor(strategy="mean")
 
 from sklearn.model_selection import cross_validate
-X_train = norm_train.drop('contamination_level', axis=1, inplace=False)
-y_train = norm_train.contamination_level
-results = cross_validate(dummy_regr, X_train, y=y_train, return_train_score=True, scoring = 'neg_mean_squared_error')
-train_mse = results["train_score"].mean()
-validation_mse = results["test_score"].mean()
+# X_train = norm_train.drop('contamination_level', axis=1, inplace=False)
+# y_train = norm_train.contamination_level
+# results = cross_validate(dummy_regr, X_train, y=y_train, return_train_score=True, scoring = 'neg_mean_squared_error')
+# train_mse = results["train_score"].mean()
+# validation_mse = results["test_score"].mean()
 
-print("train mse : {}, and valid mse : {}", train_mse, validation_mse)
+# print("train mse : {}, and valid mse : {}", train_mse, validation_mse)
 
-dummy_regr.fit(X_train, y_train) #retraining dummy for later
+# dummy_regr.fit(X_train, y_train) #retraining dummy for later
 
-# hyperparameter tuning of LinearRegressor
+# hyperparameter tuning of LinearRegressor - Q5
 from LinearRegressor import LinearRegressor
-lr_list = np.logspace(-9, -1, 9)
+lr_list = np.logspace(-5, -1, 11)
 
-validation_scores = []
 train_scores = []
-# for lr in lr_list:
-#     cur_linear_reggressor = LinearRegressor(lr)
-#     results = cross_validate(cur_linear_reggressor, X_train, y=y_train, scoring='neg_mean_squared_error', return_train_score=True)
+validation_scores = []
+for lr in lr_list:
+    cur_linear_reggressor = LinearRegressor(lr)
+    results = cross_validate(cur_linear_reggressor, np.array(X_train), y=np.array(y_train), cv = 5, scoring='neg_mean_squared_error', return_train_score=True)
+    train_scores.append( results["train_score"].mean())
+    validation_scores.append( results["test_score"].mean())
+
+print(train_scores)
+print(validation_scores)
+print("maximum - ",lr_list[np.argmax(validation_scores)], " " ,np.max(validation_scores), "and train score - ",train_scores[np.argmax(validation_scores)])
+g = plt.semilogx(lr_list, train_scores, color = 'orange', markersize = 15)
+g = plt.semilogx(lr_list, validation_scores, color = 'teal', markersize = 15)
+
+
+plt.xlabel('lr')
+plt.ylabel('score')
+plt.title('LinearRegressor Model Cross Validation Train and Validation Scores')
+plt.grid(True)
+plt.legend(["train", "validation"], loc ="lower right")
+plt.show()
+
+
+# from sklearn.linear_model import Lasso
+
+# validation_scores = []
+# train_scores = []
+# # alpha_list = np.logspace(-5, 5, 40)
+# alpha_list = np.linspace(0,1, 11)
+# for alpha in alpha_list:
+#     lasso = Lasso(alpha=alpha, fit_intercept=True)
+#     lasso.fit(X_train, y_train)
+#     results = cross_validate(lasso, X_train, y=y_train, scoring='neg_mean_squared_error', return_train_score=True)
 #     train_scores.append( results["train_score"].mean())
 #     validation_scores.append( results["test_score"].mean())
 
-#     print(results)
-# g = plt.semilogx(lr_list, train_scores, color = 'orange', markersize = 15)
-# g = plt.semilogx(lr_list, validation_scores, color = 'teal', markersize = 15)
+# g = plt.semilogx(alpha_list, train_scores, color = 'orange', markersize = 15)
+# g = plt.semilogx(alpha_list, validation_scores, color = 'teal', markersize = 15)
 
 
-# plt.xlabel('lr')
+# plt.xlabel('lambda')
 # plt.ylabel('score')
-# plt.title('LinearRegressor Model Cross Validation Train and Validation Scores')
+# plt.title('LinearRegressor (Lasso) Model Cross Validation Train and Validation Scores')
 # plt.grid(True)
 # plt.legend(["train", "validation"], loc ="upper right")
 # plt.show()
 
-
-from sklearn.linear_model import Lasso
-
-validation_scores = []
-train_scores = []
-# alpha_list = np.logspace(-5, 5, 40)
-alpha_list = np.linspace(0,1, 11)
-for alpha in alpha_list:
-    lasso = Lasso(alpha=alpha, fit_intercept=True)
-    lasso.fit(X_train, y_train)
-    results = cross_validate(lasso, X_train, y=y_train, scoring='neg_mean_squared_error', return_train_score=True)
-    train_scores.append( results["train_score"].mean())
-    validation_scores.append( results["test_score"].mean())
-
-g = plt.semilogx(alpha_list, train_scores, color = 'orange', markersize = 15)
-g = plt.semilogx(alpha_list, validation_scores, color = 'teal', markersize = 15)
+# print(train_scores)
+# print(validation_scores)
+# print(alpha_list[np.argmax(validation_scores)])
+# print(np.max(validation_scores))
+# print(train_scores[np.argmax(validation_scores)])
 
 
-plt.xlabel('lambda')
-plt.ylabel('score')
-plt.title('LinearRegressor (Lasso) Model Cross Validation Train and Validation Scores')
-plt.grid(True)
-plt.legend(["train", "validation"], loc ="upper right")
-plt.show()
+# best_lasso = Lasso(alpha=alpha_list[np.argmax(validation_scores)], fit_intercept=True)
+# best_lasso.fit(X_train, y_train)
 
-print(train_scores)
-print(validation_scores)
-print(alpha_list[np.argmax(validation_scores)])
-print(np.max(validation_scores))
-print(train_scores[np.argmax(validation_scores)])
+# print("---------------hello-----------------")
 
+# for i,nn in enumerate(best_lasso.coef_):
+#     print("feature is " + str(norm_train.columns[i]) + "value is ",best_lasso.coef_[i])
+# # idxs = np.argsort(best_lasso.coef_)[-5:]
+# # for i in  idxs:
+# #     print(norm_train.columns[i])
 
-best_lasso = Lasso(alpha=alpha_list[np.argmax(validation_scores)], fit_intercept=True)
-best_lasso.fit(X_train, y_train)
+# #"feature absolute value"
+# #coeff_array = np.sort(np.abs(best_lasso.coef_))
 
-print("---------------hello-----------------")
+# coefs = np.abs(best_lasso.coef_)
+# coefs = -np.sort(-coefs)
+# indexes = np.linspace(0,26,27)
+# ax = plt.gca()
 
-for i,nn in enumerate(best_lasso.coef_):
-    print("feature is " + str(norm_train.columns[i]) + "value is ",best_lasso.coef_[i])
-# idxs = np.argsort(best_lasso.coef_)[-5:]
-# for i in  idxs:
-#     print(norm_train.columns[i])
+# ax.plot(indexes, coefs)
 
-#"feature absolute value"
-#coeff_array = np.sort(np.abs(best_lasso.coef_))
-
-coefs = np.abs(best_lasso.coef_)
-coefs = -np.sort(-coefs)
-indexes = np.linspace(0,26,27)
-ax = plt.gca()
-
-ax.plot(indexes, coefs)
-
-plt.axis('tight')
-plt.xlabel('index')
-plt.ylabel('absolute value')
-plt.title("feature absolute value");
-plt.show()
+# plt.axis('tight')
+# plt.xlabel('index')
+# plt.ylabel('absolute value')
+# plt.title("feature absolute value");
+# plt.show()

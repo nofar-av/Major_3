@@ -139,7 +139,6 @@ class LinearRegressor(BaseEstimator, RegressorMixin):
         m = X.shape[0]
         if m == 0: 
             return 0
-        b_vector = np.ones(X.shape[0])*self.b
-        y_pred = np.sum(np.multiply(X,self.w), b_vector)
+        y_pred = X.dot(self.w)+self.b
 
         return y_pred
